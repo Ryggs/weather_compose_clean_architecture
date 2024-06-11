@@ -108,7 +108,7 @@ class CurrentWeatherViewModel @Inject constructor(
             code = -1, alertDialog = AlertDialog(
                 title = context.getString(R.string.error_title_permission_not_granted),
                 message = context.getString(R.string.error_message_permission_not_granted),
-                positiveMessage = "Open setting",
+                positiveMessage = "Open settings",
                 negativeMessage = context.getString(android.R.string.cancel),
                 positiveAction = ActionType.OPEN_PERMISSION,
             )

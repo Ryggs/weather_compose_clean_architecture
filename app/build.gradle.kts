@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Properties
 
 plugins {
@@ -86,6 +84,8 @@ android {
 //        setProperty("archivesBaseName", "weapose-${versionName}-${dateTime}")
 
         buildConfigField("String", "BASE_URL", properties.getProperty("BASE_URL"))
+        buildConfigField("String", "ONECALL_BASE_URL", properties.getProperty("ONECALL_BASE_URL"))
+        buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
     }
 
     buildTypes {
@@ -123,6 +123,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {

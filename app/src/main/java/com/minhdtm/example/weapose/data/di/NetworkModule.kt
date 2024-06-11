@@ -14,6 +14,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -29,22 +30,34 @@ object NetworkModule {
         .build()
 
     @Provides
-    fun provideRetrofit(
+    @Named("OneCallRetrofit")
+    fun provideOneCallRetrofit(
         flowCallAdapterFactory: FlowCallAdapterFactory,
         okHttpClient: OkHttpClient,
     ): Retrofit = Retrofit.Builder()
-        .baseUrl(BuildConfig.BASE_URL)
+        .baseUrl(BuildConfig.ONECALL_BASE_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(flowCallAdapterFactory)
         .build()
 
     @Provides
-    fun provideOneCallApiService(retrofit: Retrofit): OneCallApiService =
+    @Named("CurrentWeatherRetrofit")
+    fun provideWeatherRetrofit(
+        flowCallAdapterFactory: FlowCallAdapterFactory,
+        okHttpClient: OkHttpClient,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(flowCallAdapterFactory)
+        .build()
+
+    @Provides
+    fun provideOneCallApiService(@Named("OneCallRetrofit") retrofit: Retrofit): OneCallApiService =
         retrofit.create(OneCallApiService::class.java)
 
     @Provides
-    fun provideCurrentWeatherApiService(retrofit: Retrofit): CurrentWeatherApiService =
+    fun provideCurrentWeatherApiService(@Named("CurrentWeatherRetrofit") retrofit: Retrofit): CurrentWeatherApiService =
         retrofit.create(CurrentWeatherApiService::class.java)
 
     private const val TIME_OUT = 1L
