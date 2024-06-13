@@ -51,7 +51,7 @@ fun SettingsScreen(
             TopAppBar(
                 modifier = Modifier.statusBarsPadding(),
                 title = {
-                    Text(text = "Setting screen")
+                    Text(text = "Favorites")
                 },
                 navigationIcon = {
                     IconButton(onClick = onDrawer) {

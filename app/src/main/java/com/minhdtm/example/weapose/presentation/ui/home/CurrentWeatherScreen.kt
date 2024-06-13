@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +24,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -30,12 +33,14 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices.NEXUS_5
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_4_XL
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -183,37 +188,76 @@ fun CurrentWeatherScreen(
     onNavigateSearch: () -> Unit = {},
     onErrorPositiveAction: (action: ActionType?, value: Any?) -> Unit = { _, _ -> },
 ) {
-    WeatherScaffold(
-        modifier = Modifier.fillMaxSize(),
-        state = state,
-        snackbarHostState = snackbarHostState,
-        onDismissErrorDialog = onDismissErrorDialog,
-        onShowSnackbar = onShowSnackbar,
-        onErrorPositiveAction = onErrorPositiveAction,
-        topBar = {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        // Background
+        state.currentWeather?.let { currentWeather ->
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(Color.Transparent)
+            )
+            Image(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.3f),
+                painter = painterResource(id = currentWeather.background),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+            )
+        }
             CurrentWeatherAppBar(
-                modifier = Modifier.statusBarsPadding(),
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .zIndex(1f),
                 city = state.currentWeather?.city,
                 onDrawer = onDrawer,
                 onNavigateSearch = onNavigateSearch,
             )
-        },
-    ) { _, viewState ->
-        Box(Modifier.pullRefresh(pullRefreshState)) {
-            viewState.currentWeather?.let {
-                HomeContent(
-                    currentWeather = it,
-                    listHourly = viewState.listHourlyWeatherToday,
-                )
+
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                snackbarHost = { snackbarHostState },
+            ) { innerPadding ->
+
+                WeatherScaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(top = AppBarHeight),
+                    state = state,
+                    snackbarHostState = snackbarHostState,
+                    onDismissErrorDialog = onDismissErrorDialog,
+                    onShowSnackbar = onShowSnackbar,
+                    onErrorPositiveAction = onErrorPositiveAction,
+                ) { _, viewState ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pullRefresh(pullRefreshState)
+                    ) {
+                        viewState.currentWeather?.let {
+                            HomeContent(
+                                currentWeather = it,
+                                listHourly = viewState.listHourlyWeatherToday,
+                            )
+                        }
+                        PullRefreshIndicator(
+                            refreshing = state.isRefresh,
+                            state = pullRefreshState,
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
+                    }
+                }
             }
 
-            PullRefreshIndicator(
-                refreshing = state.isRefresh, state = pullRefreshState, modifier = Modifier.align(Alignment.TopCenter)
-            )
-        }
     }
-}
 
+
+}
+ private val AppBarHeight = 56.dp
 @Composable
 fun HomeContent(
     currentWeather: CurrentWeatherViewData,
@@ -224,38 +268,38 @@ fun HomeContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        NowWeather(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            currentWeather = currentWeather,
-        )
+            NowWeather(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .height(400.dp),
+                currentWeather = currentWeather,
+            )
 
-        Box(
-            modifier = Modifier
-                .navigationBarsPadding()
-                .padding(
-                    top = 50.dp,
-                    bottom = 30.dp,
-                )
-        ) {
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 15.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-            ) {
-                items(
-                    count = listHourly.size,
-                    key = {
-                        listHourly[it].timeStamp
-                    },
-                ) { index ->
-                    WeatherHour(
-                        hour = listHourly[index].time,
-                        weather = listHourly[index].weatherIcon,
+            Spacer(modifier = Modifier.height(36.dp))
+
+                    Text(
+                        text = "Today's Hourly Forecast",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 5.dp)
                     )
-                }
-            }
-        }
+                    LazyRow(
+                        contentPadding = PaddingValues(vertical = 15.dp),
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    ) {
+                        items(
+                            count = listHourly.size,
+                            key = {
+                                listHourly[it].timeStamp
+                            },
+                        )
+                        { index ->
+                            WeatherHour(
+                                hour = listHourly[index].time,
+                                weather = listHourly[index].weatherIcon,
+                            )
+                        }
+                    }
     }
 }
 
@@ -264,58 +308,43 @@ fun NowWeather(
     modifier: Modifier,
     currentWeather: CurrentWeatherViewData,
 ) {
-    Row(modifier = modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.TopCenter
+    ) {
         Image(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent),
             painter = painterResource(id = currentWeather.background),
             contentDescription = null,
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(top = 50.dp)
-                .weight(1f),
-            alignment = Alignment.CenterEnd,
-            contentScale = ContentScale.FillHeight,
+            contentScale = ContentScale.FillBounds,
         )
-
-        Column(
+        Row (
             modifier = Modifier
-                .padding(end = 15.dp)
-                .fillMaxHeight(),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(
-                    id = R.string.home_text_celsius_high_low,
-                    currentWeather.maxTemp,
-                    currentWeather.minTemp,
-                ),
-            )
+                .fillMaxWidth()
+                .padding(top = 50.dp)
+                .align(Alignment.TopCenter)
+                .background(Color.Transparent),
+        ){
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
 
-            Degrees(
-                currentWeather = currentWeather.weather,
-                currentTemp = currentWeather.temp,
-            )
-
-            DetailWeather(
-                iconId = R.drawable.ic_sun_rise,
-                title = stringResource(id = R.string.sun_rise),
-                description = currentWeather.sunRise,
-            )
-
-            DetailWeather(
-                iconId = R.drawable.ic_wind,
-                title = stringResource(id = R.string.wind),
-                description = stringResource(id = R.string.home_text_meter_per_second, currentWeather.wind),
-            )
-
-            DetailWeather(
-                iconId = R.drawable.ic_humidity,
-                title = stringResource(id = R.string.humidity),
-                description = stringResource(id = R.string.home_text_humidity, currentWeather.humidity),
-            )
+                Degrees(
+                    currentWeather = currentWeather.weather,
+                    currentTemp = currentWeather.temp,
+                )
+            }
         }
     }
 }
+
+
 
 @Composable
 fun DetailWeather(
@@ -406,7 +435,8 @@ fun Degrees(
     modifier: Modifier = Modifier,
     currentTemp: String,
     currentWeather: String,
-) {
+    isBold: Boolean = false,
+    ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.End,
@@ -414,7 +444,9 @@ fun Degrees(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = currentTemp,
-                style = MaterialTheme.typography.displayLarge,
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
+                ),
                 modifier = Modifier.alignBy(LastBaseline),
             )
 
@@ -440,7 +472,7 @@ fun WeatherHour(
 ) {
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = hour,

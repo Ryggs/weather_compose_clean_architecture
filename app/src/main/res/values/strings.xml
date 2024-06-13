@@ -35,10 +35,10 @@
 
     <!-- Drawer -->
     <string name="feature_group_tab">Feature</string>
-    <string name="current_weather_tab">Current weather</string>
-    <string name="seven_days_weather_tab">7 days weather</string>
+    <string name="current_weather_tab">Weather Today</string>
+    <string name="seven_days_weather_tab">Weekly ForeCast</string>
     <string name="another_group_tab">Another</string>
-    <string name="settings_tab">Settings</string>
+    <string name="favorites_tab">Favorites</string>
     <string name="information_tab">Information</string>
 
     <!-- Error -->

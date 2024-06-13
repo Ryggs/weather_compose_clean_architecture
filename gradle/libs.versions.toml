@@ -119,6 +119,7 @@ google-accompanist-navigation-animation = { group = "com.google.accompanist", na
 google-accompanist-systemUiController = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "google-accompanist" }
 google-accompanist-flowLayout = { group = "com.google.accompanist", name = "accompanist-flowlayout", version.ref = "google-accompanist" }
 google-accompanist-permission = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "google-accompanist" }
+google-accompanist-pemission = { group = "com.google.accompanist", name = "accompanist-swiperefresh", version.ref = "google-accompanist" }
 
 # Google Dagger
 google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "google-dagger" }

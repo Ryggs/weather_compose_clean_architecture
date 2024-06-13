@@ -17,6 +17,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.android.gms.maps.model.LatLng
@@ -71,10 +72,10 @@ enum class DrawerTab(
         title = R.string.seven_days_weather_tab,
         icon = R.drawable.ic_calendar,
     ),
-    SETTINGS(
+    FAVORITES(
         route = Screen.Settings.route,
-        title = R.string.settings_tab,
-        icon = R.drawable.ic_settings,
+        title = R.string.favorites_tab,
+        icon = R.drawable.ic_favorites,
     ),
     INFO(
         route = Screen.Info.route,
@@ -257,7 +258,7 @@ fun NavGraphBuilder.home(appState: WeatherAppState) {
 @Composable
 fun rememberWeatherAppState(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    controller: NavHostController = rememberAnimatedNavController(),
+    controller: NavHostController = rememberNavController(),
     drawer: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     snackbarHost: SnackbarHostState = remember { SnackbarHostState() },
 ): WeatherAppState = remember(coroutineScope, controller, drawer, snackbarHost) {

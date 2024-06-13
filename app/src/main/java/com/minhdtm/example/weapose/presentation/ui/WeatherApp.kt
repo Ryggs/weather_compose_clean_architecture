@@ -181,15 +181,15 @@ fun ColumnScope.WeatherDrawerContent(
     NavigationDrawerItem(
         icon = {
             Icon(
-                painter = painterResource(id = DrawerTab.SETTINGS.icon),
+                painter = painterResource(id = DrawerTab.FAVORITES.icon),
                 modifier = Modifier.size(24.dp),
                 contentDescription = null,
             )
         },
         label = {
-            Text(stringResource(id = DrawerTab.SETTINGS.title))
+            Text(stringResource(id = DrawerTab.FAVORITES.title))
         },
-        selected = DrawerTab.SETTINGS == selectedItem,
+        selected = DrawerTab.FAVORITES == selectedItem,
         onClick = onClickSettings,
         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
     )
